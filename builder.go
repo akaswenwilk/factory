@@ -61,7 +61,12 @@ func (b *Builder) LoadSetterFunc(name string, f func() string) {
 }
 
 func (b *Builder) Build(prototypeName, instanceName string) *Instance {
-	outline := b.prototypes[prototypeName].Outline
+	proto, ok := b.prototypes[prototypeName]
+	if !ok {
+		panic(fmt.Sprintf("could not build instance of %s: no prototype found", prototypeName))
+	}
+
+	outline := proto.Outline
 
 	vars := varReplacementRegex.FindAllStringSubmatch(outline, -1)
 	for _, v := range vars {
@@ -82,6 +87,7 @@ func (b *Builder) Build(prototypeName, instanceName string) *Instance {
 		baseBuilder: b,
 		contents:    contents,
 		tableName:   prototypeName,
+		buildOnly:   proto.BuildOnly,
 	}
 	b.instances[instanceName] = []*Instance{instance}
 	return instance
@@ -102,6 +108,9 @@ func (b *Builder) Instance(name string, index ...int) *Instance {
 func (b *Builder) Save() {
 	for name, instances := range b.instances {
 		for _, instance := range instances {
+			if instance.buildOnly {
+				continue
+			}
 			err := instance.persist(b.persistFunc, b.placeholderFormat)
 			if err != nil {
 				panic(fmt.Sprintf("error saving %s: %s", name, err.Error()))

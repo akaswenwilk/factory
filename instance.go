@@ -14,6 +14,7 @@ type Instance struct {
 	contents          map[string]interface{}
 	tableName         string
 	persisted         bool
+	buildOnly         bool
 }
 
 func (i *Instance) Get(attr string) interface{} {

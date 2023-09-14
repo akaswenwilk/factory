@@ -182,3 +182,14 @@ if the queriedUser doesn't have an instance at the specified index, it will pani
 None of the previous actions will actually persist anything in the database.  The method for this is Save() on the builder.  Once prototypes have been defined and instancese built and values queried, the Save() method will persist the latest state of all the instances in the builder.  If any changes were made to instances that were queried from the db, the new state of those instances will overwrite what was present in the db before.
 
 note: Save() will panic if the persistence fails
+
+## BuildOnly
+
+Sometimes it is useful to have access to instances to manipulate that aren't connected to the database.  For this case, be sure to add the buildOnly attribute to the prototype:
+
+```go
+builder.LoadPrototype(Prototype{TableName: "externalServiceResponse", Outline:`{"id":"{{uuid}}"}`, buildOnly: true})
+responseInstance := builder.Build("externalServiceResponse", "myResponse")
+
+contents := responseInstance.Contents()
+```
