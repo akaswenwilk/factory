@@ -24,7 +24,7 @@ type (
 
 type Builder struct {
 	prototypes        map[string]Prototype
-	instances         map[string][]*Instance
+	instances         []*Instance
 	setterFuncs       map[string]func() string
 	persistFunc       PersistFunc
 	queryFunc         QueryFunc
@@ -43,7 +43,7 @@ func NewBuilder(config *BuilderConfig) *Builder {
 		queryFunc:         config.QueryFunc,
 		placeholderFormat: config.PlaceholderFormat,
 		prototypes:        make(map[string]Prototype),
-		instances:         make(map[string][]*Instance),
+		instances:         make([]*Instance, 0),
 		setterFuncs: map[string]func() string{
 			uuidVar: func() string {
 				return uuid.Must(uuid.NewV4()).String()
@@ -84,37 +84,52 @@ func (b *Builder) Build(prototypeName, instanceName string) *Instance {
 	}
 
 	instance := &Instance{
+		name:        instanceName,
 		baseBuilder: b,
 		contents:    contents,
 		tableName:   prototypeName,
 		buildOnly:   proto.BuildOnly,
 	}
-	b.instances[instanceName] = []*Instance{instance}
+	b.instances = append(b.instances, instance)
 	return instance
 }
 
 func (b *Builder) Instance(name string, index ...int) *Instance {
-	instances, ok := b.instances[name]
-	if !ok {
-		panic(fmt.Sprintf("no instance %s found", name))
-	}
+	var (
+		instance *Instance
+		i        int
+	)
+
 	if len(index) > 0 {
-		return instances[index[0]]
+		i = index[0]
 	}
 
-	return instances[0]
+	for _, inst := range b.instances {
+		if inst.name == name {
+			if i == 0 {
+				instance = inst
+				break
+			}
+			i--
+			continue
+		}
+	}
+	if instance == nil {
+		panic(fmt.Sprintf("no instance %s found", name))
+	}
+
+	return instance
 }
 
 func (b *Builder) Save() {
-	for name, instances := range b.instances {
-		for _, instance := range instances {
-			if instance.buildOnly {
-				continue
-			}
-			err := instance.persist(b.persistFunc, b.placeholderFormat)
-			if err != nil {
-				panic(fmt.Sprintf("error saving %s: %s", name, err.Error()))
-			}
+	for _, instance := range b.instances {
+		name := instance.name
+		if instance.buildOnly {
+			continue
+		}
+		err := instance.persist(b.persistFunc, b.placeholderFormat)
+		if err != nil {
+			panic(fmt.Sprintf("error saving %s: %s", name, err.Error()))
 		}
 	}
 }
@@ -148,17 +163,19 @@ func (b *Builder) Find(table, instancesName, query string) []*Instance {
 	if err != nil {
 		panic(fmt.Sprintf("could not unmarshal query result: %s", err.Error()))
 	}
-	instances := make([]*Instance, len(contents))
-	for i := range instances {
-		instance := &Instance{}
-		instance.persisted = true
-		instance.contents = contents[i]
-		instance.persistedContents = contents[i]
-		instance.tableName = table
-		instance.baseBuilder = b
-		instances[i] = instance
+	instances := make([]*Instance, 0)
+	for _, c := range contents {
+		instances = append(instances, &Instance{
+			name:              instancesName,
+			baseBuilder:       b,
+			persistedContents: c,
+			contents:          c,
+			tableName:         table,
+			persisted:         true,
+			buildOnly:         true,
+		})
 	}
 
-	b.instances[instancesName] = instances
+	b.instances = append(b.instances, instances...)
 	return instances
 }

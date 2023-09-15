@@ -123,7 +123,7 @@ func (s *BuilderSuite) TestPersistInstances() {
 	}
 }
 
-func (s *BuilderSuite) TestPersistInstancesAndQueryInstancesAndUpdate() {
+func (s *BuilderSuite) TestQueryInstances() {
 	_, err := s.db.Exec("INSERT INTO users (id, username) VALUES ('123e4567-e89b-12d3-a456-426614174000', 'jenny1');")
 	s.NoError(err)
 	builder := s.newBuilder()
@@ -131,20 +131,5 @@ func (s *BuilderSuite) TestPersistInstancesAndQueryInstancesAndUpdate() {
 	s.Equal(len(users), 1)
 	instance := users[0]
 	s.Equal(instance.Get("id"), "123e4567-e89b-12d3-a456-426614174000")
-	instance.With("username", "jenny2")
-	s.Equal(instance.Get("username"), "jenny2")
-	s.Equal(instance.Get("id"), "123e4567-e89b-12d3-a456-426614174000")
-	builder.Save()
-
-	type user struct {
-		ID       string
-		Username string
-	}
-
-	var u user
-
-	err = s.db.QueryRow("SELECT id, username FROM users WHERE id = $1", instance.Get("id")).Scan(&u.ID, &u.Username)
-	s.NoError(err)
-	s.Equal(instance.Get("id"), u.ID)
-	s.Equal(instance.Get("username"), u.Username)
+	s.Equal(instance, builder.Instance("alreadyExistingUsers", 0))
 }

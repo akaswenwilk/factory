@@ -9,6 +9,7 @@ import (
 )
 
 type Instance struct {
+	name              string
 	baseBuilder       *Builder
 	persistedContents map[string]interface{}
 	contents          map[string]interface{}

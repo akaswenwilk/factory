@@ -175,11 +175,14 @@ builder.Find("user", "queriedUser", `{"username":"charles"}`)
 charles := builder.Instance("queriedUsers", 0)
 ```
 
-if the queriedUser doesn't have an instance at the specified index, it will panic.  If the index is omitted, the first instance of the queried array is returned.
+if the queriedUser doesn't have an instance at the specified index, it will panic.  If the index is omitted, the first instance of the queried array is returned. Additionally, any instances queried this way are considered build only.
 
 ## Persisting model instances
 
-None of the previous actions will actually persist anything in the database.  The method for this is Save() on the builder.  Once prototypes have been defined and instancese built and values queried, the Save() method will persist the latest state of all the instances in the builder.  If any changes were made to instances that were queried from the db, the new state of those instances will overwrite what was present in the db before.
+None of the previous actions will actually persist anything in the database.  The method for this is Save() on the builder.  Once prototypes have been defined and instancese built and values queried, the Save() method will persist the latest state of all the instances in the builder.
+
+
+Note: Save() will attempt to save each instance in the order they were built or found!
 
 note: Save() will panic if the persistence fails
 
