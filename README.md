@@ -133,6 +133,13 @@ instance := builder.Instance("jenny")
 
 note: if there is no instance called jenny built already in the builder, this will panic!
 
+If desired however, the second argument can be omitted and the instance will be named the same as the table it is queuried from:
+
+```go
+builder.Build("user")
+instance := builder.Instance("user")
+```
+
 instance in this example. will have the values specified in the outline, however they can be changed using the With() function.  
 
 ```go

@@ -60,7 +60,7 @@ func (b *Builder) LoadSetterFunc(name string, f func() string) {
 	b.setterFuncs[name] = f
 }
 
-func (b *Builder) Build(prototypeName, instanceName string) *Instance {
+func (b *Builder) Build(prototypeName string, instanceName... string) *Instance {
 	proto, ok := b.prototypes[prototypeName]
 	if !ok {
 		panic(fmt.Sprintf("could not build instance of %s: no prototype found", prototypeName))
@@ -83,8 +83,13 @@ func (b *Builder) Build(prototypeName, instanceName string) *Instance {
 		panic(fmt.Sprintf("could not build instance of %s: json error: %s", prototypeName, err.Error()))
 	}
 
+	name := prototypeName
+	if len(instanceName) > 0 {
+		name = instanceName[0]
+	}
+
 	instance := &Instance{
-		name:        instanceName,
+		name:        name,
 		baseBuilder: b,
 		contents:    contents,
 		tableName:   prototypeName,
