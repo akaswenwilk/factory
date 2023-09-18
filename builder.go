@@ -60,7 +60,7 @@ func (b *Builder) LoadSetterFunc(name string, f func() string) {
 	b.setterFuncs[name] = f
 }
 
-func (b *Builder) Build(prototypeName string, instanceName... string) *Instance {
+func (b *Builder) Build(prototypeName string, instanceName ...string) *Instance {
 	proto, ok := b.prototypes[prototypeName]
 	if !ok {
 		panic(fmt.Sprintf("could not build instance of %s: no prototype found", prototypeName))
@@ -139,7 +139,7 @@ func (b *Builder) Save() {
 	}
 }
 
-func (b *Builder) Find(table, instancesName, query string) []*Instance {
+func (b *Builder) Find(table, query string, instanceName ...string) []*Instance {
 	var queryMap map[string]interface{}
 	err := json.Unmarshal([]byte(query), &queryMap)
 	if err != nil {
@@ -169,9 +169,13 @@ func (b *Builder) Find(table, instancesName, query string) []*Instance {
 		panic(fmt.Sprintf("could not unmarshal query result: %s", err.Error()))
 	}
 	instances := make([]*Instance, 0)
+	name := table
+	if len(instanceName) > 0 {
+		name = instanceName[0]
+	}
 	for _, c := range contents {
 		instances = append(instances, &Instance{
-			name:              instancesName,
+			name:              name,
 			baseBuilder:       b,
 			persistedContents: c,
 			contents:          c,

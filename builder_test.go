@@ -134,9 +134,9 @@ func (s *BuilderSuite) TestQueryInstances() {
 	_, err := s.db.Exec("INSERT INTO users (id, username) VALUES ('123e4567-e89b-12d3-a456-426614174000', 'jenny1');")
 	s.NoError(err)
 	builder := s.newBuilder()
-	users := builder.Find("users", "alreadyExistingUsers", `{"username":"jenny1"}`)
+	users := builder.Find("users", `{"username":"jenny1"}`, "alreadyExistingUser")
 	s.Equal(len(users), 1)
 	instance := users[0]
 	s.Equal(instance.Get("id"), "123e4567-e89b-12d3-a456-426614174000")
-	s.Equal(instance, builder.Instance("alreadyExistingUsers", 0))
+	s.Equal(instance, builder.Instance("alreadyExistingUser", 0))
 }

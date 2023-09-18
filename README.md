@@ -161,7 +161,7 @@ note: if there is no field found with this name, the function will panic.
 you can use the Find() method on the builder to query the database and load the values in an instance. The result will be an array of instances stored under the name. A predefined prototype is not required for using Find
 
 ```go
-alreadyCreatedUsers := builder.Find("user", "queriedUser", `{"username":"charles"}`)
+alreadyCreatedUsers := builder.Find("user", `{"username":"charles"}`, "queriedUser")
 if len(alreadyCreatedUsers) > 0 {
     fmt.Println(alreadyCreatedUsers[0].Get("id"))   
 }
@@ -178,7 +178,7 @@ In order to use the Find() method, you must provide a queryFunc similar to the p
 Once queried, the users are stored in the builder and can be accessed similarly to built instances, only with specifying the index of the instance to access:
 
 ```go
-builder.Find("user", "queriedUser", `{"username":"charles"}`)
+builder.Find("user", `{"username":"charles"}`, "queriedUser")
 charles := builder.Instance("queriedUsers", 0)
 ```
 
