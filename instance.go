@@ -40,7 +40,7 @@ func (i *Instance) With(attr string, value interface{}) *Instance {
 func (i *Instance) Contents() string {
 	jsonContents, err := json.Marshal(i.contents)
 	if err != nil {
-		panic(fmt.Sprintf("could not marshal contents: %v", err))
+		panic(fmt.Sprintf("could not marshal contents %+v: %s", i.contents, err.Error()))
 	}
 	return string(jsonContents)
 }
