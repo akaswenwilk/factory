@@ -80,7 +80,7 @@ func (b *Builder) Build(prototypeName string, instanceName ...string) *Instance 
 	var contents map[string]interface{}
 	err := json.Unmarshal([]byte(outline), &contents)
 	if err != nil {
-		panic(fmt.Sprintf("could not build instance of %s: json error: %s", prototypeName, err.Error()))
+		panic(fmt.Sprintf("could not build instance of %s %s: json error: %s", prototypeName, outline, err.Error()))
 	}
 
 	name := prototypeName
@@ -143,7 +143,7 @@ func (b *Builder) Find(table, query string, instanceName ...string) []*Instance 
 	var queryMap map[string]interface{}
 	err := json.Unmarshal([]byte(query), &queryMap)
 	if err != nil {
-		panic(fmt.Sprintf("could not build query: json error: %s", err.Error()))
+		panic(fmt.Sprintf("could not build query: json error: %s: %s", err.Error(), query))
 	}
 
 	selectBuilder := squirrel.Select("*").From(table)
@@ -166,7 +166,7 @@ func (b *Builder) Find(table, query string, instanceName ...string) []*Instance 
 	var contents []map[string]interface{}
 	err = json.Unmarshal([]byte(result), &contents)
 	if err != nil {
-		panic(fmt.Sprintf("could not unmarshal query result: %s", err.Error()))
+		panic(fmt.Sprintf("could not unmarshal query result %s: %s", result, err.Error()))
 	}
 	instances := make([]*Instance, 0)
 	name := table
