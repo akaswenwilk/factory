@@ -81,6 +81,8 @@ This particular prototype will generate a new user with name "jenny" every time 
 builder.LoadPrototype(Prototype{TableName: "users", Outline:`{"name":"jenny"}`})
 ```
 
+There is an optional attribute for the prototype: Name.  If defined, it will store the prototype under a different name when using the Build method (see below).  Otherwise the prototype is named after the table name.
+
 #### Prototypes with random values
 
 Sometimes dynamic data is needed for generating new models based on a prototype.  For these values, you can use built in {{variable}} syntax to replace with values. only alphanumeric characters are supported.

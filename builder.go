@@ -53,7 +53,12 @@ func NewBuilder(config *BuilderConfig) *Builder {
 }
 
 func (b *Builder) LoadPrototype(prototype Prototype) {
-	b.prototypes[prototype.TableName] = prototype
+	name := prototype.Name
+	if name == nil {
+		name = &prototype.TableName
+	}
+
+	b.prototypes[*name] = prototype
 }
 
 func (b *Builder) LoadSetterFunc(name string, f func() string) {

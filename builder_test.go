@@ -83,6 +83,19 @@ func (s *BuilderSuite) TestLoadPrototypeAndCreateInstance() {
 	s.NotEqual(instance1.Get("id"), instance2.Get("id"))
 }
 
+func (s *BuilderSuite) TestLoadPrototypeCustomNameAndCreateInstance() {
+	builder := s.newBuilder()
+	customName := "jenny"
+	builder.LoadPrototype(factory.Prototype{
+		TableName: "users",
+		Outline:   `{"id":"{{uuid}}","username":"jenny"}`,
+		Name:      &customName,
+	})
+	instance1 := builder.Build("jenny", "jenny1")
+	s.Equal(instance1.Get("username"), "jenny")
+	s.Regexp(uuidRegex, instance1.Get("id"))
+}
+
 func (s *BuilderSuite) TestBuildInstanceWithoutName() {
 	builder := s.newBuilder()
 	builder.LoadPrototype(factory.Prototype{TableName: "users", Outline: `{"id":"{{uuid}}","username":"jenny"}`})
